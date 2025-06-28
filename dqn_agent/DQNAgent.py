@@ -15,42 +15,43 @@ class DQNAgent:
         self.model = Model(input_shape=(self.state_size,), action_space = self.action_size)
 
     def replay (self):
-      if len(self.memory) < self.train_start:
-        return
-    
-      experience = random.sample(self.memory, min(len(self.memory), self.batch_size))
-      state = np.zeros((self.batch_size, self.state_size))
-      prox_state = np.zeros((self.batch_size, self.state_size))
-      action, reward, end = [],[],[]
+        if len(self.memory) < self.train_start:
+            return
+        
+        experience = random.sample(self.memory, min(len(self.memory), self.batch_size))
+        state = np.zeros((self.batch_size, self.state_size))
+        prox_state = np.zeros((self.batch_size, self.state_size))
+        action, reward, end = [],[],[]
 
-      for i in range(self.batch_size):
-         state[i] = experience[i][0]
-         action.append(experience[i][1])
-         reward.append(experience[i][2])
-         prox_state[i] = experience[i][3]
-         end.append(experience[i][4])
+        for i in range(self.batch_size):
+            state[i] = experience[i][0]
+            action.append(experience[i][1])
+            reward.append(experience[i][2])
+            prox_state[i] = experience[i][3]
+            end.append(experience[i][4])
 
-      target = self.model.predict(state)    
-      target_prox = self.model.predict(prox_state)
+        target = self.model.predict(state)    
+        target_prox = self.model.predict(prox_state)
 
-      for i in range(self.batch_size):
-         if end[i]:
-            target[i][action[i]] = reward[i]
-         else:    
-            target[i][action[i]] = reward[i] + self.gamma * (np.amax(target_prox[i]))
-      self.model.fit(state, target, batch_size=self.batch_size, verbose=0)
+        for i in range(self.batch_size):
+            if end[i]:
+                target[i][action[i]] = reward[i]
+            else:    
+                target[i][action[i]] = reward[i] + self.gamma * (np.amax(target_prox[i]))
+                
+        self.model.fit(state, target, batch_size=self.batch_size, verbose=0)
 
     def act(self, state):
-       if np.random.random() <= self.epsilon:
-          return random.randrange(self.action_size)
-       else:
-          return np.argmax(self.model.predict(state)) 
+        if np.random.random() <= self.epsilon:
+            return random.randrange(self.action_size)
+        else:
+            return np.argmax(self.model.predict(state)) 
 
     def load(self, name):
-      self.model = load_model(name)
+        self.model = load_model(name)
     
     def save(self, name):
-      self.model.save(name)
+        self.model.save(name)
     
     def remember(self, state, action, reward, prox_state, end):
-      self.memory.append((state, action, reward, prox_state, end))
+        self.memory.append((state, action, reward, prox_state, end))
