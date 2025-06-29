@@ -1,3 +1,11 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+import random
+import gym
+import numpy as np
+from collections import deque
+from model import Model
+
 class DQNAgent:
 
     def __init__(self, enviroment):
@@ -20,18 +28,18 @@ class DQNAgent:
         
         experience = random.sample(self.memory, min(len(self.memory), self.batch_size))
         state = np.zeros((self.batch_size, self.state_size))
-        prox_state = np.zeros((self.batch_size, self.state_size))
+        next_state = np.zeros((self.batch_size, self.state_size))
         action, reward, end = [],[],[]
 
         for i in range(self.batch_size):
             state[i] = experience[i][0]
             action.append(experience[i][1])
             reward.append(experience[i][2])
-            prox_state[i] = experience[i][3]
+            next_state[i] = experience[i][3]
             end.append(experience[i][4])
 
         target = self.model.predict(state)    
-        target_prox = self.model.predict(prox_state)
+        target_prox = self.model.predict(next_state)
 
         for i in range(self.batch_size):
             if end[i]:
@@ -53,5 +61,5 @@ class DQNAgent:
     def save(self, name):
         self.model.save(name)
     
-    def remember(self, state, action, reward, prox_state, end):
-        self.memory.append((state, action, reward, prox_state, end))
+    def remember(self, state, action, reward, next_state, end):
+        self.memory.append((state, action, reward, next_state, end))
