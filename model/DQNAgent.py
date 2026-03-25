@@ -1,17 +1,14 @@
-import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import random
-import gym
 import numpy as np
 from collections import deque
-from model import Model
+from tensorflow.keras.models import load_model
+from model.model import Model
 
 class DQNAgent:
-
-    def __init__(self, enviroment):
+    def __init__(self, env):
         # self.amb = gym.make('CartPole-v1')
-        self.state_size = enviroment.observation_space.shape[0]
-        self.action_size = enviroment.action_space.n
+        self.state_size = env.observation_space.shape[0]
+        self.action_size = env.action_space.n
         # self.EPISODES = 500
         self.memory = deque(maxlen=2000)
         self.gamma = 0.95 

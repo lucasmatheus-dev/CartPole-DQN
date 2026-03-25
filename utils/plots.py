@@ -1,4 +1,5 @@
 import matplotlib.pyplot as mp
+import numpy as np
 
 def plot(data, size):
     episodes = []
@@ -14,7 +15,7 @@ def plot(data, size):
     mp.ylabel("Rewards")
     mp.show()
 
-def plotFinal(data_reward, data_episodes):
+def final_plot(data_reward, data_episodes):
     agentes = []
     for e in range(len(data_reward)):
         agentes.append(e+1)
